@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 -H 0.0.0.0",
-    "build": "prisma generate && next build",
+    "build": "npx prisma generate && next build",
     "db:deploy": "prisma migrate deploy",
     "start": "next start",
     "lint": "eslint",
@@ -17,7 +17,7 @@
     "db:setup": "prisma generate && prisma migrate dev && prisma db seed",
     "setup": "node scripts/setup.js",
     "generate:examples": "npx tsx scripts/generate-examples.ts",
-    "postinstall": "prisma generate",
+    "postinstall": "npx prisma generate || true",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",

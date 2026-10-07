@@ -1,0 +1,7 @@
+{
+  "name": "prompts.chat",
+  "description": "A social platform for AI prompts to share, discover, and collect prompts from the community.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

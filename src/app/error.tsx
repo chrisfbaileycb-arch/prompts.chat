@@ -7,11 +7,11 @@ import { ServerCrash, Home, ArrowLeft, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ErrorProps {
-  error: Error & { digest?: string };
+  error: globalThis.Error & { digest?: string };
   reset: () => void;
 }
 
-export default function Error({ reset }: ErrorProps) {
+export default function AppError({ error, reset }: ErrorProps) {
   const router = useRouter();
   const t = useTranslations("serverError");
 
