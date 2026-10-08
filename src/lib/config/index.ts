@@ -9,11 +9,9 @@ export interface BrandingConfig {
 }
 
 export interface ThemeConfig {
-  // Appearance
-  radius: "none" | "sm" | "md" | "lg"; // Border radius
-  variant: "flat" | "default" | "brutal"; // UI style variant
-  density: "compact" | "default" | "comfortable"; // Spacing density
-  // Colors (CSS oklch values or hex)
+  radius: "none" | "sm" | "md" | "lg";
+  variant: "flat" | "default" | "brutal";
+  density: "compact" | "default" | "comfortable";
   colors: {
     primary: string;
     secondary?: string;
@@ -24,9 +22,7 @@ export interface ThemeConfig {
 export type AuthProvider = "credentials" | "google" | "azure" | "github" | "apple" | string;
 
 export interface AuthConfig {
-  /** @deprecated Use `providers` array instead */
   provider?: AuthProvider;
-  /** Array of auth providers to enable (e.g., ["github", "google"]) */
   providers?: AuthProvider[];
   allowRegistration: boolean;
 }
@@ -56,7 +52,6 @@ export interface Sponsor {
 }
 
 export interface HomepageConfig {
-  // Hide prompts.chat repo branding (achievements, GitHub links) and use clone's branding
   useCloneBranding?: boolean;
   achievements?: {
     enabled: boolean;
@@ -80,32 +75,17 @@ export function defineConfig(config: PromptsConfig): PromptsConfig {
   return config;
 }
 
-// Load the user's config
 let cachedConfig: PromptsConfig | null = null;
 
-/**
- * Apply runtime environment variable overrides to config.
- * This allows customization via Docker env vars without rebuilding.
- * 
- * All env vars are prefixed with PCHAT_ to avoid conflicts.
- * 
- * Supported env vars:
- *   PCHAT_NAME, PCHAT_DESCRIPTION, PCHAT_LOGO, PCHAT_LOGO_DARK, PCHAT_FAVICON, PCHAT_COLOR
- *   PCHAT_THEME_RADIUS (none|sm|md|lg), PCHAT_THEME_VARIANT (default|flat|brutal), PCHAT_THEME_DENSITY
- *   PCHAT_AUTH_PROVIDERS (comma-separated), PCHAT_ALLOW_REGISTRATION (true|false)
- *   PCHAT_LOCALES (comma-separated), PCHAT_DEFAULT_LOCALE
- *   PCHAT_FEATURE_* (true|false for each feature)
- */
 function applyEnvOverrides(config: PromptsConfig): PromptsConfig {
   const env = process.env;
-  
-  // Helper functions
+
   const envBool = (key: string, fallback: boolean): boolean => {
     const val = env[key];
     if (val === undefined) return fallback;
     return val.toLowerCase() === 'true' || val === '1';
   };
-  
+
   const envArray = (key: string, fallback: string[]): string[] => {
     const val = env[key];
     if (!val) return fallback;
@@ -157,7 +137,6 @@ function applyEnvOverrides(config: PromptsConfig): PromptsConfig {
       comments: envBool('PCHAT_FEATURE_COMMENTS', config.features.comments ?? true),
     },
     homepage: env.PCHAT_NAME ? {
-      // If custom branding via env, use clone branding mode
       useCloneBranding: true,
       achievements: { enabled: false },
       sponsors: { enabled: false, items: [] },
@@ -167,15 +146,12 @@ function applyEnvOverrides(config: PromptsConfig): PromptsConfig {
 
 export async function getConfig(): Promise<PromptsConfig> {
   if (cachedConfig) return cachedConfig;
-
   let baseConfig: PromptsConfig;
-  
+
   try {
-    // Dynamic import of user config
     const userConfig = await import("../../../prompts.config");
     baseConfig = userConfig.default;
   } catch {
-    // Fallback to default config
     baseConfig = {
       branding: {
         name: "prompts.chat",
@@ -211,13 +187,11 @@ export async function getConfig(): Promise<PromptsConfig> {
       },
     };
   }
-  
-  // Apply runtime environment variable overrides
+
   cachedConfig = applyEnvOverrides(baseConfig);
   return cachedConfig;
 }
 
-// Sync version for client components (must be initialized first)
 export function getConfigSync(): PromptsConfig {
   if (!cachedConfig) {
     throw new Error("Config not initialized. Call getConfig() first in a server component.");
